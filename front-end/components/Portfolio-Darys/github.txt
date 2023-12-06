@@ -1,0 +1,40 @@
+import React, { useEffect, useState } from "react";
+import DNav from "./DNav";
+import axios from "axios";
+
+function GithubDarys() {
+  const [user, setUser] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("https://api.github.com/users/Civil-t/received_events")
+      .then((res) => {
+        const groupedEvents = res.data.reduce((acc, event) => {
+          if (!acc[event.type]) {
+            acc[event.type] = [];
+          }
+          acc[event.type].push(event);
+          return acc;
+        }, {});
+        setUser(groupedEvents);
+      });
+  }, []);
+
+  return (
+    <>
+      <DNav />
+      {Object.entries(user).map(([eventType, events], index) => (
+        <div key={index}>
+          <h2>{eventType}</h2>
+          {events.map((event, index) => (
+            <div key={index}>
+              <p>{event.repo.name}</p>
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
+  );
+}
+
+export default GithubDarys;
